@@ -1,4 +1,5 @@
 .player{
+    display: block;
     position: absolute;
     width: 150px;
     height: 170px;
@@ -74,11 +75,25 @@ p{
     padding-right: 20px;
   }
 
-
-
 body{
+    background-color: black;
+}
+
+h1{
+    color: white;
+    margin: 0px;
+}
+
+#ui{
+    display: grid;
+    grid-template-columns: repeat(3, 500px);
+    column-gap: 100px;
+}
+
+#play-area{
+    height: 850px;
+    width: 2000px;
     background-image: url("images/Ghost-Forest.jpg");
     background-repeat: no-repeat;
     background-size: cover;
-    height: 100%;
 }

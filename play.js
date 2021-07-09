@@ -5,6 +5,9 @@ const playerTxt = document.querySelector(".playerTxt")
 let userInput = ""
 let playerLane = 0
 let enemyDict = {}
+let level = 1
+let enemyLeft = 5
+const timePerLevel = ["fluff", 5 * 60, 4 * 60, 3 * 60, 2 * 60, 1 * 60]
 
 const createEnemy = (num1, num2) => {
     enemyHTML = `
@@ -18,52 +21,108 @@ const createEnemy = (num1, num2) => {
     return enemyHTML
 }
 
-const generateNumber = (maxNum, minNum) =>{
+const generateNumber = (maxNum, minNum) => {
     return Math.floor(Math.random() * (maxNum - minNum) + minNum)
 }
 
-let ghosts = [0,0,0,0,0]
+const generateNewEquation = (index) => {
+    const elem = document.querySelectorAll(".text-block > span")[index]
+    num1 = generateNumber(15, 1)
+    num2 = generateNumber(10, 1)
+    answer = num1 * num2
+    enemyDict[index] = answer
+    elem.innerText = `${num1} x ${num2} = ?`
+}
 
-let moveGhost0 = setInterval(() =>{
+const printUI = () => {
+    document.querySelector("#level").innerText = `Level: ${level} of 5`
+    document.querySelector("#timeleft").innerText = `Timeleft: ${time}s`
+}
+
+//ghost start at left 0
+let ghosts = [0, 0, 0, 0, 0]
+
+let moveGhost0 = setInterval(() => {
     moveGhosts(0)
-    checkGhost()
-}, generateNumber(3000,500))
+    checkGhost(0)
+}, generateNumber(3000, 500))
 
-let moveGhost1 = setInterval(() =>{
+let moveGhost1 = setInterval(() => {
     moveGhosts(1)
-}, generateNumber(3000,500))
+    checkGhost(1)
+}, generateNumber(3000, 500))
 
-let moveGhost2 = setInterval(() =>{
+let moveGhost2 = setInterval(() => {
     moveGhosts(2)
-}, generateNumber(3000,500))
+    checkGhost(2)
+}, generateNumber(3000, 500))
 
-let moveGhost3 = setInterval(() =>{
+let moveGhost3 = setInterval(() => {
     moveGhosts(3)
-}, generateNumber(3000,500))
+    checkGhost(3)
+}, generateNumber(3000, 500))
 
-let moveGhost4 = setInterval(() =>{
+let moveGhost4 = setInterval(() => {
     moveGhosts(4)
-}, generateNumber(3000,500))
+    checkGhost(4)
+}, generateNumber(3000, 500))
 
+const movingGhosts = [moveGhost0, moveGhost1, moveGhost2, moveGhost3, moveGhost4]
 
-const moveGhosts = (ghostNum) =>{
-    const elem = document.querySelectorAll(".ghost")[ghostNum]
-    ghosts[ghostNum] += 100
-    elem.style.left = `${ghosts[ghostNum]}px`
+let time = timePerLevel[level]
+
+let timer = setInterval(() => {
+    if (time > 0) {
+        time -= 1
+
+        printUI()
+    }
+    else {
+
+    }
+
+}, 1000);
+
+const nextLevel = () => {
+    level++
+    enemyLeft = 5
+    time = timePerLevel[level]
+    for (let i = 0; i < 5; i++) {
+        ghosts[i] = 0
+        setInterval(movingGhosts[i], generateNumber(3000, 500))
+        document.querySelectorAll(".ghost")[i].style.left = 0
+        generateNewEquation(i)
+    }
 }
 
-const checkGhost = () => {
-    const elem = document.querySelectorAll(".ghost")[0]
-    //if(elem.style.left)
-    console.log(elem.style.left)
+
+const moveGhosts = (ghostNum) => {
+    if (enemyLeft > 0) {
+        const elem = document.querySelectorAll(".ghost")[ghostNum]
+        ghosts[ghostNum] += 100
+        elem.style.left = `${ghosts[ghostNum]}px`
+    }
 }
 
+const checkGhost = (ghostNum) => {
+    if (enemyLeft > 0) {
+        const elem = document.querySelectorAll(".ghost")[ghostNum]
+        const px = elem.style.left
+        let pxIndex = px.indexOf("px")
+        let gLoc = parseInt(px.substring(0, pxIndex))
+        //console.log(gLoc)
+        if (gLoc >= 1900) {
+            clearInterval(movingGhosts[ghostNum])
+            //alert("A Ghost escaped! You lost!")
+            //nextLevel()
+        }
+    }
 
-
+}
 
 for (let i = 0; i < 5; i++) {
-    const num1 = generateNumber(15,1)
-    const num2 = generateNumber(10,1)
+    const num1 = generateNumber(15, 1)
+    const num2 = generateNumber(10, 1)
     //save answer based on enemy lane number
     enemyDict[i] = num1 * num2
     document.querySelector(".container").innerHTML += createEnemy(num1, num2)
@@ -73,27 +132,39 @@ window.addEventListener("keydown", (e) => {
     //console.log(e.key)
     switch (e.key) {
         case "ArrowUp":
-            if(playerLane === 0){
+            if (playerLane === 0) {
                 break
             }
-            else if(playerLane > 0){
+            else if (playerLane > 0) {
                 playerLane--
             }
             break
         case "ArrowDown":
-            if(playerLane === 4){
+            if (playerLane === 4) {
                 break
             }
             playerLane++
             break
-        case "Enter":
+        case "Enter": case "Spacebar":
             const enemyAns = enemyDict[playerLane]
-            console.log(enemyAns)
-            if(enemyAns === parseInt(userInput)){
+
+            if (enemyAns === parseInt(userInput)) {
                 const elems = document.querySelectorAll(".ghost")[playerLane]
-                //elems.remove()
-                //maybe just move it back to start
-                console.log(elems)
+                //stop enemy from moving
+                clearInterval(movingGhosts[playerLane])
+                //replace '?' in enemy equatio with the answer
+                let equation = document.querySelectorAll(".text-block > span")[playerLane].innerText
+                equation = equation.replace("?", enemyDict[playerLane])
+                document.querySelectorAll(".text-block > span")[playerLane].innerText = `${equation}`
+
+                //
+                enemyLeft--
+                if (enemyLeft === 0) {
+                    nextLevel()
+                }
+            }
+            else {
+                generateNewEquation(playerLane)
             }
 
             userInput = ""
@@ -114,24 +185,27 @@ window.addEventListener("keydown", (e) => {
             break
     }
 
-    //console.log(playerLane)
-    switch(playerLane){
+    switch (playerLane) {
         case 0:
             player.style.top = "0px"
-        break
+            break
         case 1:
-            player.style.top = "150px"
-        break
+            player.style.top = "160px"
+            break
         case 2:
             player.style.top = "350px"
-        break
+            break
         case 3:
             player.style.top = "520px"
-        break
+            break
         case 4:
             player.style.top = "680px"
-        break
+            break
     }
 
 })
+
+window.onload = () => {
+    printUI()
+}
 
