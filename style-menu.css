@@ -1,0 +1,19 @@
+div{
+    text-align: center;
+    padding: 20px;
+}
+
+input{
+    font-size: 18px;
+}
+
+button{
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+button:hover{
+    transform: scale(1.1);
+}
+

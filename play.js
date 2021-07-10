@@ -7,7 +7,18 @@ let playerLane = 0
 let enemyDict = {}
 let level = 1
 let enemyLeft = 5
-const timePerLevel = ["fluff", 5 * 60, 4 * 60, 3 * 60, 2 * 60, 1 * 60]
+let scoresList = new Array();
+const queryStr = location.search
+const playername = queryStr.substring(queryStr.indexOf("=") + 1)
+console.log(playername)
+const timePerLevel = ["level0", 5 * 60, 4 * 60, 3 * 60, 2 * 60, 1 * 60]
+
+class PlayerScore{
+    constructor(name, score){
+        this.pname = name
+        this.pscore = score
+    }
+}
 
 const createEnemy = (num1, num2) => {
     enemyHTML = `
@@ -39,33 +50,61 @@ const printUI = () => {
     document.querySelector("#timeleft").innerText = `Timeleft: ${time}s`
 }
 
-//ghost start at left 0
-let ghosts = [0, 0, 0, 0, 0]
+const changePage = () => {
+    window.location.replace("scores.html")
+}
 
-let moveGhost0 = setInterval(() => {
-    moveGhosts(0)
-    checkGhost(0)
-}, generateNumber(3000, 500))
+const playerLose = () => {
+    setTimeout(changePage, 3000)
+    document.querySelector(".gameover").hidden = false
+}
 
-let moveGhost1 = setInterval(() => {
-    moveGhosts(1)
-    checkGhost(1)
-}, generateNumber(3000, 500))
+const playerWin = () =>{
+    setTimeout(changePage, 3000)
+    document.querySelector(".winner").hidden = false
+}
 
-let moveGhost2 = setInterval(() => {
-    moveGhosts(2)
-    checkGhost(2)
-}, generateNumber(3000, 500))
+const writeToScore = () =>{
+    const ps = PlayerScore(playername, level)
+    if("Scores" in localStorage){
+        const sList = JSON.parse(localStorage.getItem("Scores"))
 
-let moveGhost3 = setInterval(() => {
-    moveGhosts(3)
-    checkGhost(3)
-}, generateNumber(3000, 500))
+        if(sList.some(elem => elem.pscore === ps.pscore)){
+            var indexOfScore = sList.findIndex(elem => elem.pscore === ps.pscore)
+            if(indexOfScore !== -1){
+                sList.splice(indexOfScore,0,ps)
+                localStorage.setItem("Scores", JSON.stringify(sList))
+            }
+        }
+        else{
+            sList.push(ps)
+            localStorage.setItem("Scores", JSON.stringify(sList))
+        }
+    }
+    else{
+        scoresList.push(ps)
+        localStorage.setItem("Scores", JSON.stringify(scoresList))
+    }
+}
 
-let moveGhost4 = setInterval(() => {
-    moveGhosts(4)
-    checkGhost(4)
-}, generateNumber(3000, 500))
+//ghost start at left -100 as default cause onload starts with +100
+let ghosts = [-100, -100, -100, -100, -100]
+const ghostTop = [0, 160, 350, 520, 680]
+
+const moveAndCheckGhosts = (num) =>{
+    moveGhosts(num)
+    checkGhost(num)
+}
+
+let moveGhost0 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 0)
+
+let moveGhost1 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 1)
+
+let moveGhost2 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 2)
+
+let moveGhost3 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 3)
+
+let moveGhost4 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 4)
 
 const movingGhosts = [moveGhost0, moveGhost1, moveGhost2, moveGhost3, moveGhost4]
 
@@ -78,29 +117,32 @@ let timer = setInterval(() => {
         printUI()
     }
     else {
-
+        playerLose()
     }
-
 }, 1000);
 
 const nextLevel = () => {
     level++
+    if(level > 5){
+        playerWin()
+    }
     enemyLeft = 5
     time = timePerLevel[level]
     for (let i = 0; i < 5; i++) {
-        ghosts[i] = 0
-        setInterval(movingGhosts[i], generateNumber(3000, 500))
+        ghosts[i] = -100
+        movingGhosts[i] = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), i)
         document.querySelectorAll(".ghost")[i].style.left = 0
+        document.querySelectorAll(".ghost")[i].style.display = "block"
         generateNewEquation(i)
     }
 }
-
 
 const moveGhosts = (ghostNum) => {
     if (enemyLeft > 0) {
         const elem = document.querySelectorAll(".ghost")[ghostNum]
         ghosts[ghostNum] += 100
         elem.style.left = `${ghosts[ghostNum]}px`
+        elem.style.top = `${ghostTop[ghostNum]}px`
     }
 }
 
@@ -110,22 +152,12 @@ const checkGhost = (ghostNum) => {
         const px = elem.style.left
         let pxIndex = px.indexOf("px")
         let gLoc = parseInt(px.substring(0, pxIndex))
-        //console.log(gLoc)
         if (gLoc >= 1900) {
             clearInterval(movingGhosts[ghostNum])
-            //alert("A Ghost escaped! You lost!")
-            //nextLevel()
+            playerLose()
         }
     }
 
-}
-
-for (let i = 0; i < 5; i++) {
-    const num1 = generateNumber(15, 1)
-    const num2 = generateNumber(10, 1)
-    //save answer based on enemy lane number
-    enemyDict[i] = num1 * num2
-    document.querySelector(".container").innerHTML += createEnemy(num1, num2)
 }
 
 window.addEventListener("keydown", (e) => {
@@ -150,14 +182,11 @@ window.addEventListener("keydown", (e) => {
 
             if (enemyAns === parseInt(userInput)) {
                 const elems = document.querySelectorAll(".ghost")[playerLane]
+                elems.style.display = "none"
+
                 //stop enemy from moving
                 clearInterval(movingGhosts[playerLane])
-                //replace '?' in enemy equatio with the answer
-                let equation = document.querySelectorAll(".text-block > span")[playerLane].innerText
-                equation = equation.replace("?", enemyDict[playerLane])
-                document.querySelectorAll(".text-block > span")[playerLane].innerText = `${equation}`
 
-                //
                 enemyLeft--
                 if (enemyLeft === 0) {
                     nextLevel()
@@ -207,5 +236,14 @@ window.addEventListener("keydown", (e) => {
 
 window.onload = () => {
     printUI()
+    for (i = 0; i < 5; i++) {
+        const num1 = generateNumber(15, 1)
+        const num2 = generateNumber(10, 1)
+        //save answer based on enemy lane number
+        enemyDict[i] = num1 * num2
+        document.querySelector(".container").innerHTML += createEnemy(num1, num2)
+
+        moveGhosts(i)
+    }
 }
 

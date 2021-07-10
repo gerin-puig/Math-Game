@@ -3,9 +3,19 @@
     position: absolute;
     width: 150px;
     height: 170px;
-    left: 190vh;
+    left: 1750px;
     /* 0, 150, 350, 520, 680 */
     top: 0px;
+}
+
+.gameover, .winner{
+    font-size: 42px;
+    position: absolute;
+    width: 700px;
+    height: 200px;
+    left: 700px;
+    top: 320px;
+    color: yellow;
 }
 
 img{
@@ -16,32 +26,11 @@ img{
 .ghost{
     /* border: 1px solid red; */
     display: block;
-    position: relative;
+    position: absolute;
     width: 150px;
     height: 170px;
     left: 0px;
 }
-/* .ghost-1{
-    position: relative;
-    width: 150px;
-    height: 170px;
-}
-.ghost-2{
-    position: relative;
-    width: 150px;
-    height: 170px;
-}
-.ghost-3{
-    position: relative;
-    width: 150px;
-    height: 170px;
-    left: 300;
-}
-.ghost-4{
-    position: relative;
-    width: 150px;
-    height: 170px;
-} */
 
 span{
     color: white;
