@@ -3,9 +3,28 @@
     position: absolute;
     width: 150px;
     height: 170px;
-    left: 190vh;
+    left: 1750px;
     /* 0, 150, 350, 520, 680 */
     top: 0px;
+}
+
+button{
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+
+.gameover-winner{
+    text-align: center;
+    font-size: 42px;
+    position: absolute;
+    width: 700px;
+    height: 200px;
+    left: 600px;
+    top: 320px;
+    color: yellow;
 }
 
 img{
@@ -16,32 +35,11 @@ img{
 .ghost{
     /* border: 1px solid red; */
     display: block;
-    position: relative;
+    position: absolute;
     width: 150px;
     height: 170px;
     left: 0px;
 }
-/* .ghost-1{
-    position: relative;
-    width: 150px;
-    height: 170px;
-}
-.ghost-2{
-    position: relative;
-    width: 150px;
-    height: 170px;
-}
-.ghost-3{
-    position: relative;
-    width: 150px;
-    height: 170px;
-    left: 300;
-}
-.ghost-4{
-    position: relative;
-    width: 150px;
-    height: 170px;
-} */
 
 span{
     color: white;
