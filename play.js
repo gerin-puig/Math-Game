@@ -5,16 +5,27 @@ const playerTxt = document.querySelector(".playerTxt")
 let userInput = ""
 let playerLane = 0
 let enemyDict = {}
-let level = 1
+let level = 5
 let enemyLeft = 5
 let scoresList = new Array();
 const queryStr = location.search
 const playername = queryStr.substring(queryStr.indexOf("=") + 1)
-console.log(playername)
-const timePerLevel = ["level0", 5 * 60, 4 * 60, 3 * 60, 2 * 60, 1 * 60]
+let time = 4 * 60
+let gameover = false
 
-class PlayerScore{
-    constructor(name, score){
+let timer = setInterval(() => {
+    if (time > 0) {
+        time -= 1
+
+        printUI()
+    }
+    else {
+        playerLose()
+    }
+}, 1000);
+
+class PlayerScore {
+    constructor(name, score) {
         this.pname = name
         this.pscore = score
     }
@@ -55,33 +66,42 @@ const changePage = () => {
 }
 
 const playerLose = () => {
-    setTimeout(changePage, 3000)
-    document.querySelector(".gameover").hidden = false
+    writeToScore()
+    clearInterval(timer)
+    for (i = 0; i < 5; i++) {
+        clearInterval(movingGhosts[i])
+    }
+    gameover = true
+    document.querySelector(".gameover-winner").hidden = false
+    document.querySelector(".gameover-winner > h1").innerText = "GAME OVER!"
 }
 
-const playerWin = () =>{
-    setTimeout(changePage, 3000)
-    document.querySelector(".winner").hidden = false
+const playerWin = () => {
+    writeToScore()
+    clearInterval(timer)
+    gameover = true
+    document.querySelector(".gameover-winner").hidden = false
+    document.querySelector(".gameover-winner > h1").innerText = "YOU WON!"
 }
 
-const writeToScore = () =>{
-    const ps = PlayerScore(playername, level)
-    if("Scores" in localStorage){
+const writeToScore = () => {
+    const ps = new PlayerScore(playername, level)
+    if ("Scores" in localStorage) {
         const sList = JSON.parse(localStorage.getItem("Scores"))
 
-        if(sList.some(elem => elem.pscore === ps.pscore)){
+        if (sList.some(elem => elem.pscore === ps.pscore)) {
             var indexOfScore = sList.findIndex(elem => elem.pscore === ps.pscore)
-            if(indexOfScore !== -1){
-                sList.splice(indexOfScore,0,ps)
+            if (indexOfScore !== -1) {
+                sList.splice(indexOfScore, 0, ps)
                 localStorage.setItem("Scores", JSON.stringify(sList))
             }
         }
-        else{
+        else {
             sList.push(ps)
             localStorage.setItem("Scores", JSON.stringify(sList))
         }
     }
-    else{
+    else {
         scoresList.push(ps)
         localStorage.setItem("Scores", JSON.stringify(scoresList))
     }
@@ -91,7 +111,7 @@ const writeToScore = () =>{
 let ghosts = [-100, -100, -100, -100, -100]
 const ghostTop = [0, 160, 350, 520, 680]
 
-const moveAndCheckGhosts = (num) =>{
+const moveAndCheckGhosts = (num) => {
     moveGhosts(num)
     checkGhost(num)
 }
@@ -108,26 +128,15 @@ let moveGhost4 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 4)
 
 const movingGhosts = [moveGhost0, moveGhost1, moveGhost2, moveGhost3, moveGhost4]
 
-let time = timePerLevel[level]
 
-let timer = setInterval(() => {
-    if (time > 0) {
-        time -= 1
-
-        printUI()
-    }
-    else {
-        playerLose()
-    }
-}, 1000);
 
 const nextLevel = () => {
-    level++
-    if(level > 5){
+    if (level >= 5) {
         playerWin()
+        return
     }
+    level++
     enemyLeft = 5
-    time = timePerLevel[level]
     for (let i = 0; i < 5; i++) {
         ghosts[i] = -100
         movingGhosts[i] = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), i)
@@ -157,7 +166,28 @@ const checkGhost = (ghostNum) => {
             playerLose()
         }
     }
+}
 
+document.querySelector(".gameover-winner").addEventListener("click", (e) => {
+    if (e.target.classList.contains("play-again")) {
+        location.reload()
+    }
+    else if (e.target.classList.contains("view-scores")) {
+        changePage()
+    }
+})
+
+window.onload = () => {
+    printUI()
+    for (i = 0; i < 5; i++) {
+        const num1 = generateNumber(15, 1)
+        const num2 = generateNumber(10, 1)
+        //save answer based on enemy lane number
+        enemyDict[i] = num1 * num2
+        document.querySelector(".container").innerHTML += createEnemy(num1, num2)
+
+        moveGhosts(i)
+    }
 }
 
 window.addEventListener("keydown", (e) => {
@@ -189,6 +219,9 @@ window.addEventListener("keydown", (e) => {
 
                 enemyLeft--
                 if (enemyLeft === 0) {
+                    // if(level > 5){
+                    //     return
+                    // }
                     nextLevel()
                 }
             }
@@ -214,7 +247,8 @@ window.addEventListener("keydown", (e) => {
             break
     }
 
-    switch (playerLane) {
+    if(!gameover){
+        switch (playerLane) {
         case 0:
             player.style.top = "0px"
             break
@@ -231,19 +265,10 @@ window.addEventListener("keydown", (e) => {
             player.style.top = "680px"
             break
     }
+    }
+    
 
 })
 
-window.onload = () => {
-    printUI()
-    for (i = 0; i < 5; i++) {
-        const num1 = generateNumber(15, 1)
-        const num2 = generateNumber(10, 1)
-        //save answer based on enemy lane number
-        enemyDict[i] = num1 * num2
-        document.querySelector(".container").innerHTML += createEnemy(num1, num2)
 
-        moveGhosts(i)
-    }
-}
 

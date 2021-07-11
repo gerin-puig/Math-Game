@@ -1,19 +1,77 @@
-div{
+
+.menu{
+    margin-top: 150px;
     text-align: center;
     padding: 20px;
 }
 
+h1{
+    color: white;
+}
+
+html{
+    background: url(images/Ghost-Forest.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+
 input{
     font-size: 18px;
+    margin: 20px;
+    text-align: center;
+    font-weight: bold;
 }
 
 button{
     margin: 10px;
     font-size: 18px;
     font-weight: bold;
+    background-color: purple;
+    color: white;
+    padding: 10px;
 }
 
 button:hover{
     transform: scale(1.1);
+}
+
+.banner {
+    position: fixed;
+    background-color: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    height: 50px;
+    left: 0;
+    top: 0;
+    
+  }
+
+
+/* .footer {
+    height: 50px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: blueviolet;
+    color: white;
+    text-align: center;
+  } */
+
+img{
+    margin-left: 20px;
+    width: 20%;
+}  
+
+.audio{
+    position: fixed;
+    left: 1600px;
+    top: 100px;
+}
+
+.audio:hover{
+    transform: scale(1.4);
+}
+
+.audio:active{
+    transform: scale(1.3);
 }
 
