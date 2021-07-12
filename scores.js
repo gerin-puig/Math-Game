@@ -24,6 +24,9 @@ const getScores = () => {
 window.onload = () => {
     const playerscores = getScores()
     let scoreHTML = ""
+    if(playerscores.length === 0){
+        scoreHTML += `<span>No Scores Yet</span>`
+    }
     for (i = 0; i < count; i++) {
         scoreHTML += `<span>${i+1}. ${playerscores[i].pname} - Level ${playerscores[i].pscore} </span>`
     }
@@ -31,5 +34,9 @@ window.onload = () => {
         ${scoreHTML}
     `
 }
+
+document.querySelector("button").addEventListener("click", ()=>{
+    window.location.href=`menu.html`
+})
 
 
