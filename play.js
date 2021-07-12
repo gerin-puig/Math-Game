@@ -5,13 +5,17 @@ const playerTxt = document.querySelector(".playerTxt")
 let userInput = ""
 let playerLane = 0
 let enemyDict = {}
-let level = 5
+let level = 1
 let enemyLeft = 5
+const numberOfEnemies = 5
 let scoresList = new Array();
 const queryStr = location.search
-const playername = queryStr.substring(queryStr.indexOf("=") + 1)
 let time = 4 * 60
 let gameover = false
+const webLink = queryStr.substring(queryStr.indexOf("=") + 1)
+const webVars = webLink.split("|")
+const playername = webVars[1]
+const playSound = parseInt(webVars[0])
 
 let timer = setInterval(() => {
     if (time > 0) {
@@ -68,7 +72,7 @@ const changePage = () => {
 const playerLose = () => {
     writeToScore()
     clearInterval(timer)
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < numberOfEnemies; i++) {
         clearInterval(movingGhosts[i])
     }
     gameover = true
@@ -128,8 +132,6 @@ let moveGhost4 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 4)
 
 const movingGhosts = [moveGhost0, moveGhost1, moveGhost2, moveGhost3, moveGhost4]
 
-
-
 const nextLevel = () => {
     if (level >= 5) {
         playerWin()
@@ -137,7 +139,7 @@ const nextLevel = () => {
     }
     level++
     enemyLeft = 5
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < numberOfEnemies; i++) {
         ghosts[i] = -100
         movingGhosts[i] = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), i)
         document.querySelectorAll(".ghost")[i].style.left = 0
@@ -179,7 +181,12 @@ document.querySelector(".gameover-winner").addEventListener("click", (e) => {
 
 window.onload = () => {
     printUI()
-    for (i = 0; i < 5; i++) {
+    if(playSound === 1){
+        document.querySelector("audio").play()
+        document.querySelector("audio").volume = 0.6
+    }
+
+    for (i = 0; i < numberOfEnemies; i++) {
         const num1 = generateNumber(15, 1)
         const num2 = generateNumber(10, 1)
         //save answer based on enemy lane number
@@ -207,6 +214,7 @@ window.addEventListener("keydown", (e) => {
             }
             playerLane++
             break
+
         case "Enter": case "Spacebar":
             const enemyAns = enemyDict[playerLane]
 
@@ -219,25 +227,29 @@ window.addEventListener("keydown", (e) => {
 
                 enemyLeft--
                 if (enemyLeft === 0) {
-                    // if(level > 5){
-                    //     return
-                    // }
                     nextLevel()
                 }
+                let sound = new Audio("sounds/fireball.ogg")
+                sound.play()
             }
             else {
                 generateNewEquation(playerLane)
+
+                let sound = new Audio("sounds/fail-s.ogg")
+                sound.play()
             }
 
             userInput = ""
             playerTxt.innerText = userInput
             break
+
         case "Backspace":
             if (userInput.length > 0) {
                 userInput = userInput.slice(0, -1)
                 playerTxt.innerText = userInput
             }
             break
+            
         case "0": case "1": case "2": case "3": case "4": case "5": case "6": case "7": case "8": case "9":
             if (userInput.length > 5) {
                 break

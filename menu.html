@@ -12,16 +12,19 @@
 
 <body>
     <div class="banner">
-        <img src="images/Ghost-Forest.jpg">
+        <a class="active" href="">Math Game</a>
     </div>
 
     <div class="audio">
-        <img class="volume high" src="images/audio-high.png">
+        <img class="volume" src="images/audio-low.png">
+        <audio loop volume="0.5">
+            <source src="sounds/background-music.mp3" type="audio/mpeg">
+        </audio>
     </div>
 
     <div class="menu">
         <h1>MATH GAME LANE DEFENSE</h1>
-        <input type="text" placeholder="Enter Player Name" maxlength="10"/>
+        <input type="text" placeholder="Enter Player Name" maxlength="10" />
         <div>
             <button>Play Game</button><br>
             <button>View Rules</button>
