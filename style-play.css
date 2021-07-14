@@ -99,7 +99,7 @@ h1{
 #play-area{
     height: 850px;
     width: 2000px;
-    background-image: url("images/Ghost-Forest.jpg");
+    background-image: url("assets/images/Ghost-Forest.jpg");
     background-repeat: no-repeat;
     background-size: cover;
 }

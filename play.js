@@ -38,7 +38,7 @@ class PlayerScore {
 const createEnemy = (num1, num2) => {
     enemyHTML = `
     <div class="ghost">
-        <img src="images/ghost.png"/>
+        <img src="assets/images/ghost.png"/>
         <div class="text-block">
             <span>${num1} x ${num2} = ?</span>
         </div>
@@ -238,13 +238,13 @@ window.addEventListener("keydown", (e) => {
                 if (enemyLeft === 0) {
                     nextLevel()
                 }
-                let sound = new Audio("sounds/fireball.ogg")
+                let sound = new Audio("assets/sounds/fireball.ogg")
                 sound.play()
             }
             else {
                 generateNewEquation(playerLane)
 
-                let sound = new Audio("sounds/fail-s.ogg")
+                let sound = new Audio("assets/sounds/fail-s.ogg")
                 sound.play()
             }
 
