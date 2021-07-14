@@ -21,13 +21,13 @@ document.querySelectorAll("button")[2].addEventListener("click",()=>{
 document.querySelector(".audio").addEventListener("click", (e) => {
     document.querySelector(".volume").classList.toggle("high")
     if(e.target.classList.contains("high")){
-        document.querySelector(".volume").src = "images/audio-high.png" 
+        document.querySelector(".volume").src = "assets/images/audio-high.png" 
         document.querySelector("audio").play()
         document.querySelector("audio").volume = 0.6
         webLink = `play.html?sound=1`
     }
     else{
-        document.querySelector(".volume").src = "images/audio-low.png" 
+        document.querySelector(".volume").src = "assets/images/audio-low.png" 
         document.querySelector("audio").pause()
         webLink = `play.html?sound=0`
     }
