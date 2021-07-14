@@ -9,13 +9,16 @@ class PlayerScore {
 let count = 0
 const getScores = () => {
     let topscores = []
+    let max = 5
     if ("Scores" in localStorage) {
         const sList = JSON.parse(localStorage.getItem("Scores"))
-
-        for (i = 0; i < sList.length; i++) {
+        if(sList.length < 5){
+            max = sList.length
+        }
+        for (i = 0; i < max; i++) {
             topscores[i] = new PlayerScore(sList[i].pname, sList[i].pscore)
         }
-        count = sList.length
+        count = max
     }
     
     return topscores
