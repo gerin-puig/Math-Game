@@ -7,14 +7,14 @@ let playerLane = 0
 let enemyDict = {}
 let level = 1
 let enemyLeft = 5
-const numberOfEnemies = 5
 let scoresList = new Array();
-const queryStr = location.search
-let time = 4 * 60
+let time = 2 * 60
 let gameover = false
+const numberOfEnemies = 5
+const queryStr = location.search
 const webLink = queryStr.substring(queryStr.indexOf("=") + 1)
 const webVars = webLink.split("|")
-const playername = webVars[1]
+const playername = webVars[1].substring(webVars[1].indexOf("=")+1)
 const playSound = parseInt(webVars[0])
 
 let timer = setInterval(() => {
@@ -74,6 +74,8 @@ const playerLose = () => {
     clearInterval(timer)
     for (i = 0; i < numberOfEnemies; i++) {
         clearInterval(movingGhosts[i])
+        const elems = document.querySelectorAll(".ghost")[i]
+        elems.style.display = "none"
     }
     gameover = true
     document.querySelector(".gameover-winner").hidden = false
@@ -93,8 +95,17 @@ const writeToScore = () => {
     if ("Scores" in localStorage) {
         const sList = JSON.parse(localStorage.getItem("Scores"))
 
+        //finds same score
         if (sList.some(elem => elem.pscore === ps.pscore)) {
-            var indexOfScore = sList.findIndex(elem => elem.pscore === ps.pscore)
+            let indexOfScore = sList.findIndex(elem => elem.pscore === ps.pscore)
+            if (indexOfScore !== -1) {
+                sList.splice(indexOfScore, 0, ps)
+                localStorage.setItem("Scores", JSON.stringify(sList))
+            }
+        }
+        //finds a score thats lower
+        else if(sList.some(elem => elem.pscore < ps.pscore)){
+            let indexOfScore = sList.findIndex(elem => elem.pscore < ps.pscore)
             if (indexOfScore !== -1) {
                 sList.splice(indexOfScore, 0, ps)
                 localStorage.setItem("Scores", JSON.stringify(sList))
@@ -111,8 +122,7 @@ const writeToScore = () => {
     }
 }
 
-//ghost start at left -100 as default cause onload starts with +100
-let ghosts = [-100, -100, -100, -100, -100]
+let ghosts = [0, 0, 0, 0, 0]
 const ghostTop = [0, 160, 350, 520, 680]
 
 const moveAndCheckGhosts = (num) => {
@@ -120,15 +130,15 @@ const moveAndCheckGhosts = (num) => {
     checkGhost(num)
 }
 
-let moveGhost0 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 0)
+let moveGhost0 = setInterval(moveAndCheckGhosts, generateNumber(30, 1), 0)
 
-let moveGhost1 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 1)
+let moveGhost1 = setInterval(moveAndCheckGhosts, generateNumber(30, 1), 1)
 
-let moveGhost2 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 2)
+let moveGhost2 = setInterval(moveAndCheckGhosts, generateNumber(30, 1), 2)
 
-let moveGhost3 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 3)
+let moveGhost3 = setInterval(moveAndCheckGhosts, generateNumber(30, 1), 3)
 
-let moveGhost4 = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), 4)
+let moveGhost4 = setInterval(moveAndCheckGhosts, generateNumber(30, 1), 4)
 
 const movingGhosts = [moveGhost0, moveGhost1, moveGhost2, moveGhost3, moveGhost4]
 
@@ -140,8 +150,8 @@ const nextLevel = () => {
     level++
     enemyLeft = 5
     for (let i = 0; i < numberOfEnemies; i++) {
-        ghosts[i] = -100
-        movingGhosts[i] = setInterval(moveAndCheckGhosts, generateNumber(3000, 500), i)
+        ghosts[i] = 0
+        movingGhosts[i] = setInterval(moveAndCheckGhosts, generateNumber(30, 1), i)
         document.querySelectorAll(".ghost")[i].style.left = 0
         document.querySelectorAll(".ghost")[i].style.display = "block"
         generateNewEquation(i)
@@ -151,7 +161,7 @@ const nextLevel = () => {
 const moveGhosts = (ghostNum) => {
     if (enemyLeft > 0) {
         const elem = document.querySelectorAll(".ghost")[ghostNum]
-        ghosts[ghostNum] += 100
+        ghosts[ghostNum] += 1
         elem.style.left = `${ghosts[ghostNum]}px`
         elem.style.top = `${ghostTop[ghostNum]}px`
     }
@@ -183,7 +193,7 @@ window.onload = () => {
     printUI()
     if(playSound === 1){
         document.querySelector("audio").play()
-        document.querySelector("audio").volume = 0.6
+        document.querySelector("audio").volume = 0.5
     }
 
     for (i = 0; i < numberOfEnemies; i++) {
@@ -198,7 +208,6 @@ window.onload = () => {
 }
 
 window.addEventListener("keydown", (e) => {
-    //console.log(e.key)
     switch (e.key) {
         case "ArrowUp":
             if (playerLane === 0) {
@@ -281,6 +290,4 @@ window.addEventListener("keydown", (e) => {
     
 
 })
-
-
 
